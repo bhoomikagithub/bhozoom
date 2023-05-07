@@ -243,20 +243,20 @@ document.querySelector('#roomdets').addEventListener('click', function(){
   document.querySelector("#chatting").appendChild(div);
 
 
-  socket.emit("nameset", username)
+var count=document.querySelector("#people-logo h2");
 
-socket.on("online", function (data) {
-  var div = document.createElement("div");
-  div.classList.add("onlineusers");
-  div.innerHTML = "Online users " + data.nums.length;
-  document.querySelector("#people-logo").appendChild(div);
+  socket.emit('nameset', username)
 
-  var div2 = document.createElement("div");
-  div2.classList.add("onlineusers");
-  div2.innerHTML = data.name;
-  document.querySelector(".peoples").appendChild(div2);
+  socket.on('online',(data)=>{
+    count.textContent= data.length;
 
+    var clutter = ``;
+    data.forEach((elem)=>{
+      clutter += `<div class="peoples">
+      <i class="ri-user-3-line"></i>
+      <h2></h2>
+    </div>`;
     })
 
-
-   
+    document.querySelector('#participants-div').innerHTML= clutter ;
+  })

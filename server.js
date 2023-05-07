@@ -37,8 +37,8 @@ app.get('/craeteroom/new', function(req, res){
   res.redirect(`/${uuidV4()}`)
 })
 
-var onlineusersid = [];
-var onlineusersname = [];
+var onlineUserNames = [];
+var onlineUsersId = [];
  
  io.on('connection', socket => {
   socket.on('join-room', (roomId, userId) => {
@@ -50,26 +50,22 @@ var onlineusersname = [];
     //     io.to(roomId).emit('msg', message)
   // });
   
-  socket.on("msg", function (data) {
-      io.to(roomId).emit('msg', { msg: data.message, name: data.name })
-    // io.emit("msgs", { msg: data.message, name: data.name });
-io.to(roomId).emit("online", { nums: onlineusersid, name: onlineusersname });
-
-})
-
-socket.on("nameset", function (data) {
-  onlineusersid.push(socket.id);
-  onlineusersname.push(data);
-io.to(roomId).emit("online", { nums: onlineusersid, name: onlineusersname });
-
- 
-  // console.log(onlineusersid.length , " nameset wla console ",data ,"  ",onlineusersname);
+  socket.on('nameset',(data)=>{
+    console.log(data)
+    onlineUserNames.push(data)
+    onlineUsersId.push(socket.id);
+    io.emit('online', onlineUserNames);
 
 })
 
 
     socket.on('disconnect', () => {
       socket.to(roomId).broadcast.emit('user-disconnected', userId)
+      
+      var joIndexremoveKarnaHai= onlineUsersId.indexOf(socket.id , 1)
+      onlineUserNames.splice(joIndexremoveKarnaHai);
+      onlineUsersId.splice (joIndexremoveKarnaHai ,1);
+  io.emit('online', onlineUserNames);
     })
   })
 })
