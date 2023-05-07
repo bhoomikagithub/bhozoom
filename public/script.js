@@ -241,22 +241,24 @@ document.querySelector('#roomdets').addEventListener('click', function(){
   div.classList.add("setName");
   div.textContent = username;
   document.querySelector("#chatting").appendChild(div);
-
-
-var count=document.querySelector("#people-logo h2");
-
   socket.emit('nameset', username)
 
-  socket.on('online',(data)=>{
-    count.textContent= data.length;
 
-    var clutter = ``;
-    data.forEach((elem)=>{
-      clutter += `<div class="peoples">
-      <i class="ri-user-3-line"></i>
-      <h2></h2>
-    </div>`;
+  //  username = document.querySelector('#name').value;
+  var count=document.querySelector("#people-logo h2");
+  
+  
+    socket.on('online',(data)=>{
+      count.textContent= data.length;
+  
+      var clutter = ``;
+      data.forEach((elem)=>{
+        clutter += `<div class="peoples">
+        <i class="ri-user-3-line"></i>
+        <h2>${elem}</h2>
+      </div>`;
+      })
+  
+      document.querySelector('#participants-div').innerHTML= clutter ;
     })
-
-    document.querySelector('#participants-div').innerHTML= clutter ;
-  })
+  

@@ -58,7 +58,6 @@ var onlineUsersId = [];
 
 })
 
-
     socket.on('disconnect', () => {
       socket.to(roomId).broadcast.emit('user-disconnected', userId)
       
