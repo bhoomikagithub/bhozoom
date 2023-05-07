@@ -38,9 +38,7 @@ document.querySelector("#typing-div button")
           }
           document.querySelector("textarea").value="";
         })
-        socket.on("online", function(data){
-          console.log(data);
-        })
+
         socket.on("msg", function(data){
           var div= document.createElement("div");
           div.classList.add("msg");
@@ -49,6 +47,35 @@ document.querySelector("#typing-div button")
 
           document.querySelector("#chatting").appendChild(div);
         })
+
+
+        username = document.querySelector('#name').value;
+    
+        var div = document.createElement("div");
+        div.classList.add("setName");
+        div.textContent = username;
+        document.querySelector("#chatting").appendChild(div);
+        socket.emit('nameset', username)
+      
+      
+        //  username = document.querySelector('#name').value;
+        var count=document.querySelector("#people-logo h2");
+        
+        
+          socket.on('online',(data)=>{
+            count.textContent= data.length;
+        
+            var clutter = ``;
+            data.forEach((elem)=>{
+              clutter += `<div class="peoples">
+              <i class="ri-user-3-line"></i>
+              <h2>${elem}</h2>
+            </div>`;
+            })
+        
+            document.querySelector('#participants-div').innerHTML= clutter ;
+          })
+        
 
 })
 document.querySelector("#cb").addEventListener("click", function(){
@@ -235,30 +262,41 @@ document.querySelector('#roomdets').addEventListener('click', function(){
   //           500);
   //   })
 
-  username = document.querySelector('#name').value;
-    
-  var div = document.createElement("div");
-  div.classList.add("setName");
-  div.textContent = username;
-  document.querySelector("#chatting").appendChild(div);
-  socket.emit('nameset', username)
 
 
-  //  username = document.querySelector('#name').value;
-  var count=document.querySelector("#people-logo h2");
-  
-  
-    socket.on('online',(data)=>{
-      count.textContent= data.length;
-  
-      var clutter = ``;
-      data.forEach((elem)=>{
-        clutter += `<div class="peoples">
-        <i class="ri-user-3-line"></i>
-        <h2>${elem}</h2>
-      </div>`;
+  var screenSharing = false
+function startScreenShare() {
+  if (screenSharing) {
+      stopScreenSharing()
+  }
+  navigator.mediaDevices.getDisplayMedia({ video: true }).then((stream) => {
+      screenStream = stream;
+      let videoTrack = screenStream.getVideoTracks()[0];
+      videoTrack.onended = () => {
+          stopScreenSharing()
+      }
+      if (peer) {
+          let sender = currentPeer.peerConnection.getSenders().find(function (s) {
+              return s.track.kind == videoTrack.kind;
+          })
+          sender.replaceTrack(videoTrack)
+          screenSharing = true
+      }
+      console.log(screenStream)
+  })
+}
+
+function stopScreenSharing() {
+  if (!screenSharing) return;
+  let videoTrack = local_stream.getVideoTracks()[0];
+  if (peer) {
+      let sender = currentPeer.peerConnection.getSenders().find(function (s) {
+          return s.track.kind == videoTrack.kind;
       })
-  
-      document.querySelector('#participants-div').innerHTML= clutter ;
-    })
-  
+      sender.replaceTrack(videoTrack)
+  }
+  screenStream.getTracks().forEach(function (track) {
+      track.stop();
+  });
+  screenSharing = false
+}
