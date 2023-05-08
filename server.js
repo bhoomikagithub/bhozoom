@@ -36,6 +36,10 @@ app.get('/:room', (req, res) => {
 app.get('/craeteroom/new', function(req, res){
   res.redirect(`/${uuidV4()}`)
 })
+app.get('/n', function(req, res){
+  res.render('welcome') 
+})
+
 
 // var onlineUserNames = [];
 // var onlineUsersId = [];
