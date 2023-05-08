@@ -22,6 +22,8 @@ navigator.mediaDevices.getUserMedia({
     const video = document.createElement('video')
     call.on('stream', userVideoStream => {
       addVideoStream(video, userVideoStream)
+
+      currentPeer = call;  
     })
   })
 
@@ -29,14 +31,15 @@ navigator.mediaDevices.getUserMedia({
     connectToNewUser(userId, stream)
   })
   
-document.querySelector("#typing-div button")
-        .addEventListener("click", function(){
-          var data=document.querySelector("textarea").value;
-          if(data.trim().length>=1){
-            // socket.emit("msg",data);
-          socket.emit("msg", { message: data, name: username });
-          }
-          document.querySelector("textarea").value="";
+  document.querySelector("#typing-div button")
+  .addEventListener("click", function(){
+    var data=document.querySelector("textarea").value;
+    if(data.trim().length>=1){
+      // socket.emit("msg",data);
+      socket.emit("msg", { message: data, name: username });
+    }
+    document.querySelector("textarea").value="";
+    // socket.emit('nameset', username)
         })
 
         socket.on("msg", function(data){
@@ -49,32 +52,31 @@ document.querySelector("#typing-div button")
         })
 
 
-        username = document.querySelector('#name').value;
+        // username = document.querySelector('#name').value;
     
-        var div = document.createElement("div");
-        div.classList.add("setName");
-        div.textContent = username;
-        document.querySelector("#chatting").appendChild(div);
-        socket.emit('nameset', username)
+        // var div = document.createElement("div");
+        // div.classList.add("setName");
+        // div.textContent = username;
+        // document.querySelector("#chatting").appendChild(div);
       
       
-        //  username = document.querySelector('#name').value;
-        var count=document.querySelector("#people-logo h2");
+        // //  username = document.querySelector('#name').value;
+        // var count=document.querySelector("#people-logo h2");
         
         
-          socket.on('online',(data)=>{
-            count.textContent= data.length;
+        //   socket.on('online',(data)=>{
+        //     count.textContent= data.length;
         
-            var clutter = ``;
-            data.forEach((elem)=>{
-              clutter += `<div class="peoples">
-              <i class="ri-user-3-line"></i>
-              <h2>${elem}</h2>
-            </div>`;
-            })
+        //     var clutter = ``;
+        //     data.forEach((elem)=>{
+        //       clutter += `<div class="peoples">
+        //       <i class="ri-user-3-line"></i>
+        //       <h2>${elem}</h2>
+        //     </div>`;
+        //     })
         
-            document.querySelector('#participants-div').innerHTML= clutter ;
-          })
+        //     document.querySelector('#participants-div').innerHTML= clutter ;
+        //   })
         
 
 })
@@ -263,7 +265,7 @@ document.querySelector('#roomdets').addEventListener('click', function(){
   //   })
 
 
-
+  var currentPeer = null
   var screenSharing = false
 function startScreenShare() {
   if (screenSharing) {
@@ -300,3 +302,16 @@ function stopScreenSharing() {
   });
   screenSharing = false
 }
+
+var peoplelogo =document.querySelector("#people-logo");
+var participantsdiv = document.querySelector("#participants-div")
+socket.on('user-list', (users)=>{
+  participantsdiv.innerHTML="";
+  users_arr= Object.values(users);
+  for(i=0;i<users_arr.length;i++){
+    let p=document.createElement('p');
+    p.innerHTML=users_arr[i];
+    participantsdiv.appendChild(p)
+  }
+  peoplelogo.innerHTML=users_arr.length;
+})

@@ -37,34 +37,36 @@ app.get('/craeteroom/new', function(req, res){
   res.redirect(`/${uuidV4()}`)
 })
 
-var onlineUserNames = [];
-var onlineUsersId = [];
- 
+// var onlineUserNames = [];
+// var onlineUsersId = [];
+ var users={};
  io.on('connection', socket => {
   socket.on('join-room', (roomId, userId) => {
     socket.join(roomId)
     socket.to(roomId).broadcast.emit('user-connected', userId);
+        io.emit("user-list", users)
     // messages
   //   socket.on('msg', (message) => {
     //     //send message to the same room
     //     io.to(roomId).emit('msg', message)
   // });
   
-  socket.on('nameset',(data)=>{
-    console.log(data)
-    onlineUserNames.push(data)
-    onlineUsersId.push(socket.id);
-    io.emit('online', onlineUserNames);
+//   socket.on('nameset',(data)=>{
+//     console.log(data)
+//     onlineUserNames.push(data)
+//     onlineUsersId.push(socket.id);
+//     io.emit('online', onlineUserNames);
 
-})
+// })
 
     socket.on('disconnect', () => {
       socket.to(roomId).broadcast.emit('user-disconnected', userId)
+      io.emit("user-list", users)
       
-      var joIndexremoveKarnaHai= onlineUsersId.indexOf(socket.id , 1)
-      onlineUserNames.splice(joIndexremoveKarnaHai);
-      onlineUsersId.splice (joIndexremoveKarnaHai ,1);
-  io.emit('online', onlineUserNames);
+  //     var joIndexremoveKarnaHai= onlineUsersId.indexOf(socket.id , 1)
+  //     onlineUserNames.splice(joIndexremoveKarnaHai);
+  //     onlineUsersId.splice (joIndexremoveKarnaHai ,1);
+  // io.emit('online', onlineUserNames);
     })
   })
 })
