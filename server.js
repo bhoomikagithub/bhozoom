@@ -4,6 +4,7 @@ const app = express()
 // app.use(cors())
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
+var bodyParser = require('body-parser');
 const { ExpressPeerServer } = require('peer');
 const peerServer = ExpressPeerServer(server, {
   debug: true
@@ -11,6 +12,7 @@ const peerServer = ExpressPeerServer(server, {
 const { v4: uuidV4 } = require('uuid')
 
 app.use('/peerjs', peerServer);
+app.use(bodyParser());
 
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
@@ -40,6 +42,7 @@ app.get('/n', function(req, res){
   res.render('welcome') 
 })
 
+var usernames = []
 
 // var onlineUserNames = [];
 // var onlineUsersId = [];
@@ -49,6 +52,12 @@ app.get('/n', function(req, res){
     socket.join(roomId)
     socket.to(roomId).broadcast.emit('user-connected', userId);
         io.emit("user-list", users)
+
+        socket.on('name', username =>{
+          usernames.push(username);
+          socket.emit('users', usernames);
+        })
+        
     // messages
   //   socket.on('msg', (message) => {
     //     //send message to the same room
@@ -71,6 +80,7 @@ app.get('/n', function(req, res){
   //     onlineUserNames.splice(joIndexremoveKarnaHai);
   //     onlineUsersId.splice (joIndexremoveKarnaHai ,1);
   // io.emit('online', onlineUserNames);
+  // console.log()
     })
   })
 })
